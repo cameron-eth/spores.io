@@ -16,32 +16,32 @@
     }
   </style>
 </head>
-<body class="mx-20 px-20 bg-black">
+<body class="mx-2 sm:mx-10 bg-black">
 
   <!-- Thank you message container -->
   <h1 class="text-2xl font-bold mb-4 hidden text-center" id="thankYouMessage">Thank you for your order!</h1>
 
-  <div class="bg-gray-100 p-8 mt-5 mx-auto max-w-md rounded-md mb-10" id="orderFormContainer">
+  <div class="bg-gray-100 p-4 mt-5 mx-auto max-w-md rounded-md mb-10" id="orderFormContainer">
     <h2 class="text-2xl font-bold mb-4">Order Spores</h2>
-    <label class="block mb-4">
+    <label class="block mb-2">
       Name:
       <input type="text" id="name" class="border-2 border-gray-400 rounded-md w-full">
     </label>
-    <label class="block mb-4">
+    <label class="block mb-2">
       Quantity:
       <input type="text" id="quantity" class="border-2 border-gray-400 rounded-md w-full">
     </label>
-    <label class="block mb-4">
+    <label class="block mb-2">
       Address:
       <input type="text" id="address" class="border-2 border-gray-400 rounded-md w-full">
     </label>
     <!-- Add more fields as needed -->
 
     <!-- Stripe Card Element container -->
-    <div id="cardElementContainer" class="border-2 border-gray-400 rounded-md p-4 mb-4"></div>
+    <div id="cardElementContainer" class="border-2 border-gray-400 rounded-md p-2 mb-4"></div>
 
     <!-- Checkbox for optional payment -->
-    <label class="block mb-4">
+    <label class="block mb-2">
       <input type="checkbox" id="optionalPayment" class="mr-2">
       Pay at Checkout
     </label>
@@ -50,10 +50,11 @@
     <button id="submitOrder" class="bg-black text-white px-4 py-2 rounded-md hover:bg-green-300">Submit Order</button>
 
     <!-- Payment confirmation message -->
-    <div id="paymentConfirmation" class="hidden mt-4 text-green-600 font-bold">Payment Successful!</div>
+    <div id="paymentConfirmation" class="hidden mt-2 text-green-600 font-bold">Payment Successful!</div>
   </div>
 
   <script>
+    // Your original JavaScript code goes here
     // Initialize Stripe with your publishable key
     const stripe = Stripe('YOUR_PUBLISHABLE_KEY'); // Replace 'YOUR_PUBLISHABLE_KEY' with your Stripe publishable key
 
