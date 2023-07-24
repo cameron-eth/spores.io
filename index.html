@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+  <title>SPORES</title>
+</head>
+<body class="mx-20 px-20 bg-black">
+  <div class="container mx-auto px-4">
+    <section class="mb-10 mt-5 text-xl">
+      <nav>
+        <ul class="flex mt-20 font-light justify-center mt-10 text-white">
+          <h1 class="flex justify-center text-8xl font-bold text-white" id="sfText">SPORES</h1>
+        </ul>
+      </nav>
+    </section>
+
+    <section class="flex flex-col items-center text-white mt-10 mb-20">
+      <img src="images/MuseWire.png" class="mr-20 max-w-20 min-w-10" alt="">
+      <p id="productName" class="text-2xl bg-gradient-to-r from-blue-100 to-purple-600 bg-clip-text mt-10 text-transparent mt-4">Megadose</p>
+      <p id="productSize" class="text-xl mt text-white">
+        <span id="prevSize" class="cursor-pointer hover:text-blue-500" onclick="changeProduct(-1)">&#8249;</span>
+        <span id="currentSize">10oz</span>
+        <span id="nextSize" class="cursor-pointer hover:text-blue-500" onclick="changeProduct(1)">&#8250;</span>
+      </p>
+      <!-- Add the select element for oz size -->
+      <select id="ozSizeSelect" class="bg-white text-black mt-4 rounded hidden">
+        <option value="option1">6</option>
+        <option value="option2">12</option>
+        <option value="option3">24</option>
+      </select>
+
+      <ul>
+        <li id="order" class=" mt-5 hover:text-green-500 "><a href="order-form.html">ORDER</a></li>
+      </ul>
+    </section>
+  </div>
+  
+  <script>
+    
+    // Sample implementation of the changeProduct function
+    let currentSizeIndex = 0;
+    const sizes = ["6", "12", "24"];
+
+    function changeProduct(direction) {
+      currentSizeIndex += direction;
+      if (currentSizeIndex < 0) {
+        currentSizeIndex = sizes.length - 1;
+      } else if (currentSizeIndex >= sizes.length) {
+        currentSizeIndex = 0;
+      }
+      document.getElementById("currentSize").innerText = sizes[currentSizeIndex] + "oz";
+
+      // Trigger the spinning animation
+      const spinningImage = document.getElementById("spinningImage");
+      gsap.to(spinningImage, { rotation: "+=360", duration: 1 });
+    }
+
+    // Add an event listener to the select element for oz size
+    const ozSizeSelect = document.getElementById("ozSizeSelect");
+    ozSizeSelect.addEventListener("change", () => {
+      // Get the selected value and convert it to an integer
+      const selectedSize = parseInt(ozSizeSelect.value);
+      // Find the index of the selected size in the sizes array
+      const newIndex = sizes.findIndex(size => parseInt(size) === selectedSize);
+      if (newIndex !== -1) {
+        // Calculate the direction of the change
+        const direction = newIndex - currentSizeIndex;
+        // Call the changeProduct function with the calculated direction
+        changeProduct(direction);
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+  <!-- Add the Stripe library -->
+  <script src="https://js.stripe.com/v3/"></script>
+
+  <title>SPORES - Order Form</title>
+  <style>
+    /* Your custom CSS styles for hiding the elements */
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body class="mx-20 px-20 bg-black">
+
+  <!-- Thank you message container -->
+  <h1 class="text-2xl font-bold mb-4 hidden text-center" id="thankYouMessage">Thank you for your order!</h1>
+
+  <div class="bg-gray-100 p-8 mt-5 mx-auto max-w-md rounded-md mb-10" id="orderFormContainer">
+    <h2 class="text-2xl font-bold mb-4">Order Spores</h2>
+    <label class="block mb-4">
+      Name:
+      <input type="text" id="name" class="border-2 border-gray-400 rounded-md w-full">
+    </label>
+    <label class="block mb-4">
+      Quantity:
+      <input type="text" id="quantity" class="border-2 border-gray-400 rounded-md w-full">
+    </label>
+    <label class="block mb-4">
+      Address:
+      <input type="text" id="address" class="border-2 border-gray-400 rounded-md w-full">
+    </label>
+    <!-- Add more fields as needed -->
+
+    <!-- Stripe Card Element container -->
+    <div id="cardElementContainer" class="border-2 border-gray-400 rounded-md p-4 mb-4"></div>
+
+    <!-- Checkbox for optional payment -->
+    <label class="block mb-4">
+      <input type="checkbox" id="optionalPayment" class="mr-2">
+      Pay at Checkout
+    </label>
+
+    <!-- Stripe payment button -->
+    <button id="submitOrder" class="bg-black text-white px-4 py-2 rounded-md hover:bg-green-300">Submit Order</button>
+
+    <!-- Payment confirmation message -->
+    <div id="paymentConfirmation" class="hidden mt-4 text-green-600 font-bold">Payment Successful!</div>
+  </div>
+
+  <script>
+    // Initialize Stripe with your publishable key
+    const stripe = Stripe('YOUR_PUBLISHABLE_KEY'); // Replace 'YOUR_PUBLISHABLE_KEY' with your Stripe publishable key
+
+    // Get the "Submit Order" button, payment confirmation message, and optional payment checkbox by their IDs
+    const submitOrderButton = document.getElementById('submitOrder');
+    const paymentConfirmation = document.getElementById('paymentConfirmation');
+    const optionalPaymentCheckbox = document.getElementById('optionalPayment');
+    const orderFormContainer = document.getElementById('orderFormContainer');
+
+    // Create a Stripe Card Element and mount it to the container
+    const cardElementContainer = document.getElementById('cardElementContainer');
+    const cardElement = stripe.elements().create('card');
+    cardElement.mount(cardElementContainer);
+
+    // Add an event listener to the "Submit Order" button
+    submitOrderButton.addEventListener('click', async () => {
+      // Collect form data
+      const name = document.getElementById('name').value;
+      const quantity = document.getElementById('quantity').value;
+      const address = document.getElementById('address').value;
+      const payAtCheckout = optionalPaymentCheckbox.checked;
+
+      // You can perform form validation here before proceeding
+
+      if (!payAtCheckout) {
+        // If optional payment is selected, submit the order directly without Stripe payment
+        await submitOrderWithoutPayment(name, quantity, address);
+        return;
+      }
+
+      // Otherwise, proceed with the Stripe payment flow
+      const { paymentMethod, error } = await stripe.createPaymentMethod({
+        type: 'card',
+        card: cardElement,
+      });
+
+      if (error) {
+        // Handle errors (e.g., invalid card details)
+        console.error(error.message);
+      } else {
+        // PaymentMethod created successfully, proceed with payment
+        const { id } = paymentMethod;
+
+        // Send the form data and PaymentMethod ID to your server for processing
+        const response = await fetch('/process_order_with_payment', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name,
+            quantity,
+            address
+            // paymentMethodId: id,
+          }),
+        });
+
+        if (response.ok) {
+
+          // Payment and order successful, display confirmation message
+          paymentConfirmation.classList.remove('hidden');
+
+          // Hide the order form after submission
+          orderFormContainer.style.display = 'none';
+        } else {
+          // Payment failed, display error message
+          console.error('Payment processing error.');
+        }
+      }
+    });
+
+    // Function to submit the order without Stripe payment
+    async function submitOrderWithoutPayment(name, quantity, address) {
+      // Send the form data to your server for processing
+      const response = await fetch('/process_order_without_payment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name,
+          quantity,
+          address,
+        }),
+      });
+
+      if (response.ok) {
+        submitOrderButton.addEventListener("click", (e) => {
+            // Order successful, display confirmation message
+            paymentConfirmation.classList.remove('hidden');
+            // Hide the order form after submission
+            orderFormContainer.style.display = 'none';
+        })
+      
+      } else {
+        // Order processing failed, display error message
+        console.error('Order processing error.');
+      }
+    }
+  </script>
+</body>
+</html>
